@@ -4,59 +4,77 @@
 #include <fstream>
 #include <vector>
 #include <list>
+#include <algorithm>
 using namespace std;
 
 class students{
 	map<string , string> m;
+	string path;
+	fstream fs;
 public:
 	students(){}
-	students(string login, string parol)
+
+	void to_register(string path)
 	{
-		auto it = m.find(login);
-		if (it == m.end())
-		{
-			m.insert({ login , parol });
-		}
-	}
-	void to_register()
-	{
-		cout << "Registration : ";
+		cout << "   Registration !\n";
 		string login,  parol ;
-		cout << "Enter your login : ";
+		cout << "Create your login : ";
 		cin >> login;
-		cout << "Enter your parol : ";
+		cout << "Create your parol : ";
 		cin >> parol;
-		auto it = m.find(login);
-		if (it == m.end())
-		{
-
-			m.insert({ login , parol });
-
-		}
-	}
-	bool check_login()
-	{
-		string login;
-		cout << "Enter your login : ";
-		cin >> login;
 		auto it = m.find(login);
 		if (it != m.end())
 		{
-			return true;
+
+			cout << "This user already exists !";
 		}
-		else return false;
+		else {
+			m.insert({ login , parol });
+
+			fs.open( path, fstream::out);
+			if (!fs.is_open())
+			{
+				cout << "Error open file !";
+			}
+			else
+			{
+				fs << login  <<" "<< parol;
+			}
+			fs.close();
+		}
+	}
+	bool check_login(string path)
+	{
+		string login ,password , login1 , password1;
+		cout << "Enter your login : ";
+		cin >> login;
+		cout << "Enter your password : ";
+		cin >> password;
+			fs.open(path, fstream::in);
+			while (!fs.eof()) {
+				fs >> login1 >> password1;
+				if (login == login1 && password ==password1) {
+					return true;
+				}
+			}
+			fs.close();
+
+			return true;
+		
 	}
 };
 class admin {
 	string login;
 	string password;
+	string path;
+	fstream fs;
 public:
 	admin()
 	{
 		this->login = " ";
 		this->password = " ";
 	}
-	admin(string ligin, string password)
+	admin(string login, string password)
 	{
 		this->login = login;
 		this->password = password;
@@ -68,6 +86,14 @@ public:
 	string get_password()
 	{
 		return  password;
+	}
+	void save_in_file(string path)
+	{
+
+	}
+	void read_from_file(string path)
+	{
+
 	}
 };
 class answer {
@@ -146,6 +172,7 @@ public:
 class test {
 	list<questions> t;
 	int rating;
+	string path;
 public:
 	test() { rating = 0; }
 	test(list<questions> q)
@@ -177,6 +204,14 @@ public:
 	{
 		return (rating*100)/t.size();
 	}
+	void save_in_file(string path)
+	{
+
+	}
+	void read_from_file(string path)
+	{
+
+	}
 };
 class system {
 	admin a;
@@ -187,14 +222,16 @@ public:
 };
 int main()
 {
-	students s("anna" , "maukh");
-	if (s.check_login() == true)
+	string path = "students";
+	students s;
+	s.to_register(path);
+	if (s.check_login(path) == true)
 	{
-	
-		cout << "user find !";
+		cout << "Hello! ";
 	}
-	else {
-		s.to_register();
+	else
+	{
+		cout << "not !";
 	}
 	return 0;
 
