@@ -42,6 +42,7 @@ public:
 			}
 			fs.close();
 		}
+		cout << " Acount created !\n  log in\n";
 	}
 	bool check_login(string path)
 	{
@@ -209,10 +210,9 @@ public:
 			string  new_qestion;
 			string new_answer;
 			int num;
-			map<string, int> n;
 			fs >> new_qestion;
 			while (!fs.eof()) {
-				fs >> new_answer >> num;
+				fs  >> num >> new_answer;
 				
 			}
 		}
@@ -303,15 +303,104 @@ public:
 		fs.close();
 	}
 };
+int menu()
+{
+	int choice=0;
+	cout << "0 - Exit !\n";
+	cout << "1 - Student registration\n";
+	cout << "2 - Login to the student's account\n";
+	cout << "3 - Login to the admin account\n";
+	cout << "Enter your choice!";
+	cin >> choice;
+	return choice;
+}
+int menu1()
+{
+	int choice=0;
+	cout << "0 - Exit !\n";
+	cout << "1 - Choose and pass the test\n";
+	cout << "2 - View statistics\n";
+	cout << "Enter your choice!";
+	cin >> choice;
+	return choice;
+}
 int main()
 {
-	questions q("Znayditʹ- 6 i 7", list<answer>{ { "5", 4  }, { "5", 5 }} , 4);
-	string path = "students";
-	string path1 = "admin";
-	students s;
-	s.to_register(path);
 	admin a("anna", "makukh");
-	a.save_in_file(path1);
+	string path = "admin"; string path1 = "students";
+	a.save_in_file(path);
+	students s;
+	int choice;
+	do {
+		choice = menu();
+		if (!choice)break;
+		switch (choice)
+		{
+		case 1:
+			s.to_register(path1);
+			if (s.check_login(path1) == true)
+			{
+				int choice1;
+				do {
+					choice1 = menu1();
+					if (!choice1)break;
+					switch (choice1)
+					{
+					case 1:
+						
+						break;
+					case 2:
+						break;
+					case 3:
+
+						break;
+					}
+				} while (true);
+			}
+			else {
+				cout << "Something went wrong try again !";
+			}
+			system("pause");
+			break;
+		case 2:
+			if (s.check_login(path1) == true)
+			{
+				int choice1;
+				do {
+					choice1 = menu1();
+					if (!choice1)break;
+					switch (choice1)
+					{
+					case 1:
+
+						break;
+					case 2:
+						break;
+					case 3:
+
+						break;
+					}
+				} while (true);
+			}
+			else {
+				cout << "Something went wrong try again !";
+			}
+			system("pause");
+			break;
+		case 3:
+			if (a.cheak_admin(path) == true)
+			{
+				cout << "Hello admin" << a.get_login() << "\n";
+			}
+			else
+			{
+				cout << "It is not correct !\n";
+			}
+			system("pause");
+			break;
+		}
+	} while (true);
+
 
 
 	return 0;
