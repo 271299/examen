@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <string>
 #include <map>
 #include <fstream>
@@ -58,8 +58,7 @@ public:
 				}
 			}
 			fs.close();
-
-			return true;
+		return false;
 		
 	}
 };
@@ -89,10 +88,33 @@ public:
 	}
 	void save_in_file(string path)
 	{
-
+		fs.open(path, fstream::out);
+		if (!fs.is_open())
+		{
+			cout << "Error open file !";
+		}
+		else
+		{
+			fs << login << " " << password;
+		}
+		fs.close();
 	}
-	void read_from_file(string path)
+	bool cheak_admin(string path)
 	{
+		string login, password, login1, password1;
+		cout << "Enter your login : ";
+		cin >> login;
+		cout << "Enter your password : ";
+		cin >> password;
+		fs.open(path, fstream::in);
+		while (!fs.eof()) {
+			fs >> login1 >> password1;
+			if (login == login1 && password == password1) {
+				return true;
+			}
+		}
+		fs.close();
+		return false;
 
 	}
 };
@@ -135,32 +157,70 @@ public:
 		else return false;
 	}
 };
-class questions {
-	string question;
+class questions : answer {
+	string q;
 	list<answer> answers;
 	int  correct_answer;
+	string path;
+	fstream fs;
 public:
-	questions() { this->question = " "; }
-	questions(string question, list<answer> a , int b )
+	questions() { this->q = " "; }
+	questions(string q, list<answer> a , int b )
 	{
-		this->question = question;
+		this->q = q;
 		this->answers = a;
 		this->correct_answer = b;
 	}
 	void print_question()
 	{
-		cout << question<<"\n";
-	}
-	void print_answer()
-	{
-		for (auto it=answers.begin(); it!=answers.end(); it++)
+		cout << q<<"\n";
+		for (auto it = answers.begin(); it != answers.end(); it++)
 		{
 			it->print();
 		}
 	}
+	void save_in_file(string path)
+	{
+		fs.open(path, fstream::out);
+		if (!fs.is_open())
+		{
+			cout << "Error open file !";
+		}
+		else
+		{
+			fs << q;
+			for (auto it = answers.begin(); it != answers.end(); it++)
+			{
+				fs<<it->get_number()<<" " << it->get_answer() << " ";
+
+			}
+		}
+		fs.close();
+	}
+	void read_from_file(string path)
+	{
+		fs.open(path, fstream::in);
+		if (!fs.is_open())
+		{
+			cout << "Error open file !";
+		}
+		else
+		{
+			string  new_qestion;
+			string new_answer;
+			int num;
+			map<string, int> n;
+			fs >> new_qestion;
+			while (!fs.eof()) {
+				fs >> new_answer >> num;
+				
+			}
+		}
+		fs.close();
+	}
 	string get_question()
 	{
-		return question;
+		return q;
 	}
 	int get_number_of_correct_answer()
 	{
@@ -169,10 +229,11 @@ public:
 	
 };
 	
-class test {
+class test :questions {
 	list<questions> t;
 	int rating;
 	string path;
+	fstream fs;
 public:
 	test() { rating = 0; }
 	test(list<questions> q)
@@ -186,6 +247,7 @@ public:
 		for (auto it=t.begin();it!=t.end(); it++)
 		{
 			it->print_question();
+
 			cout << "Enter answer : ";
 			cin >> answer;
 			if (it->get_number_of_correct_answer() == answer)
@@ -204,35 +266,54 @@ public:
 	{
 		return (rating*100)/t.size();
 	}
-	void save_in_file(string path)
+	void save_in_file()
 	{
-
+		fs.open(path, fstream::out);
+		if (!fs.is_open())
+		{
+			cout << "Error open file !";
+		}
+		else
+		{
+			for (auto it = t.begin(); it != t.end(); it++)
+			{
+				it->save_in_file(path);
+				cout << "\n";
+				
+			}
+		}
+		fs.close();
 	}
 	void read_from_file(string path)
 	{
+		fs.open(path, fstream::in);
+		if (!fs.is_open())
+		{
+			cout << "Error open file !";
+		}
+		else
+		{
+			for (auto it = t.begin(); it != t.end(); it++)
+			{
+				it->read_from_file(path);
+				cout << "\n";
 
+			}
+		}
+		fs.close();
 	}
-};
-class system {
-	admin a;
-	students s;
-public:
-
-
 };
 int main()
 {
+	questions q("Znayditʹ- 6 i 7", list<answer>{ { "5", 4  }, { "5", 5 }} , 4);
 	string path = "students";
+	string path1 = "admin";
 	students s;
 	s.to_register(path);
-	if (s.check_login(path) == true)
-	{
-		cout << "Hello! ";
-	}
-	else
-	{
-		cout << "not !";
-	}
+	admin a("anna", "makukh");
+	a.save_in_file(path1);
+
+
 	return 0;
 
 }
