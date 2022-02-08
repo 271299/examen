@@ -6,7 +6,7 @@
 #include <list>
 #include <algorithm>
 using namespace std;
-
+//-------------------------------------------------------
 class students{
 	map<string , string> m;
 	string path;
@@ -14,14 +14,9 @@ class students{
 public:
 	students(){}
 
-	void to_register(string path)
+	void to_register(string login, string parol)
 	{
-		cout << "   Registration !\n";
-		string login,  parol ;
-		cout << "Create your login : ";
-		cin >> login;
-		cout << "Create your parol : ";
-		cin >> parol;
+		
 		auto it = m.find(login);
 		if (it != m.end())
 		{
@@ -30,19 +25,25 @@ public:
 		}
 		else {
 			m.insert({ login , parol });
-
-			fs.open( path, fstream::out);
-			if (!fs.is_open())
-			{
-				cout << "Error open file !";
-			}
-			else
-			{
-				fs << login  <<" "<< parol;
-			}
-			fs.close();
 		}
-		cout << " Acount created !\n  log in\n";
+		cout << " Acount created !\n   log in :  \n";
+	}
+	void save_in_file(string path)
+	{
+		fs.open(path, fstream::out);
+		if (!fs.is_open())
+		{
+			cout << "Error open file !";
+		}
+		else
+		{
+			for (auto it = m.begin(); it !=m.end(); it++)
+			{
+				fs << it->first << " " << it->second;
+			}
+			
+		}
+		fs.close();
 	}
 	bool check_login(string path)
 	{
@@ -63,6 +64,7 @@ public:
 		
 	}
 };
+//----------------------------------
 class admin {
 	string login;
 	string password;
@@ -119,6 +121,7 @@ public:
 
 	}
 };
+//-----------------------------------
 class answer {
 	string a;
 	int number_of_answer;
@@ -126,6 +129,11 @@ public:
 	answer() { this->a = "no set"; this->number_of_answer = 0; }
 	answer(string a , int number_of_answer) 
 	{ 
+		this->a = a;
+		this->number_of_answer = number_of_answer;
+	}
+	void add_new_answer(string a, int number_of_answer)
+	{
 		this->a = a;
 		this->number_of_answer = number_of_answer;
 	}
@@ -158,6 +166,7 @@ public:
 		else return false;
 	}
 };
+//---------------------------------------------------------------------
 class questions : answer {
 	string q;
 	list<answer> answers;
@@ -180,6 +189,12 @@ public:
 			it->print();
 		}
 	}
+	void add_new_qestion(string question , list<answer> answers , int  correct_answer)
+	{
+		this->q = question;
+		this->answers = answers;
+		this->correct_answer = correct_answer;
+	}
 	void save_in_file(string path)
 	{
 		fs.open(path, fstream::out);
@@ -189,17 +204,18 @@ public:
 		}
 		else
 		{
-			fs << q;
+			fs << q<< " "<<correct_answer<<" ";
 			for (auto it = answers.begin(); it != answers.end(); it++)
 			{
-				fs<<it->get_number()<<" " << it->get_answer() << " ";
+				fs<<it->get_number()<<" " << it->get_answer() ;
 
 			}
 		}
 		fs.close();
 	}
-	void read_from_file(string path)
+	questions read_from_file(string path)
 	{
+		questions que;
 		fs.open(path, fstream::in);
 		if (!fs.is_open())
 		{
@@ -209,14 +225,18 @@ public:
 		{
 			string  new_qestion;
 			string new_answer;
-			int num;
-			fs >> new_qestion;
+			int num , correct_num ; 
+			answer a;
+			list<answer> l;
+			fs >> new_qestion >>correct_num;
 			while (!fs.eof()) {
 				fs  >> num >> new_answer;
-				
+				l.push_back(answer( new_answer,num));
 			}
+			que.add_new_qestion(new_qestion , l , correct_num);
 		}
 		fs.close();
+		return que;
 	}
 	string get_question()
 	{
@@ -230,21 +250,15 @@ public:
 };
 	
 class test :questions {
-	list<questions> t;
+	vector<questions> t;
 	int rating;
-	string path;
 	fstream fs;
 public:
-	test() { rating = 0; }
-	test(list<questions> q)
-	{
-		this->t = q;
-		int rating = 0;
-	}
-	void do_test()
+	test() { this->rating = 0; }
+	void do_test(vector<questions> my_test)
 	{
 		int answer;
-		for (auto it=t.begin();it!=t.end(); it++)
+		for (auto it= my_test.begin();it!= my_test.end(); it++)
 		{
 			it->print_question();
 
@@ -266,7 +280,7 @@ public:
 	{
 		return (rating*100)/t.size();
 	}
-	void save_in_file()
+	void save_in_file(string path)
 	{
 		fs.open(path, fstream::out);
 		if (!fs.is_open())
@@ -284,9 +298,10 @@ public:
 		}
 		fs.close();
 	}
-	void read_from_file(string path)
+	vector<questions> read_from_file(string path1 )
 	{
-		fs.open(path, fstream::in);
+		vector<questions> v;
+		fs.open(path1 , fstream::in);
 		if (!fs.is_open())
 		{
 			cout << "Error open file !";
@@ -295,12 +310,13 @@ public:
 		{
 			for (auto it = t.begin(); it != t.end(); it++)
 			{
-				it->read_from_file(path);
+				v.push_back(it->read_from_file(path1));
 				cout << "\n";
 
 			}
 		}
 		fs.close();
+		return v;
 	}
 };
 int menu()
@@ -310,7 +326,7 @@ int menu()
 	cout << "1 - Student registration\n";
 	cout << "2 - Login to the student's account\n";
 	cout << "3 - Login to the admin account\n";
-	cout << "Enter your choice!";
+	cout << "Enter your choice! ";
 	cin >> choice;
 	return choice;
 }
@@ -320,24 +336,47 @@ int menu1()
 	cout << "0 - Exit !\n";
 	cout << "1 - Choose and pass the test\n";
 	cout << "2 - View statistics\n";
-	cout << "Enter your choice!";
+	cout << "Enter your choice! ";
+	cin >> choice;
+	return choice;
+}
+int menu2()
+{
+	int choice = 0;
+	cout << "0 - Exit !\n";
+	cout << "1 - Add student\n";
+	cout << "2 - Delete student\n";
+	cout << "3 - Add new test\n";
+	cout << "4 - Delete test\n";
+	cout << "Enter your choice! ";
 	cin >> choice;
 	return choice;
 }
 int main()
 {
+	test t;
+	test t1;
 	admin a("anna", "makukh");
-	string path = "admin"; string path1 = "students";
-	a.save_in_file(path);
+	string login, password;
+	string path = "admin"; string path1 = "students"; string path2 = "test";
+	t.do_test(t.read_from_file(path2));
+	/*a.save_in_file(path);
 	students s;
 	int choice;
 	do {
+		system("cls");
 		choice = menu();
 		if (!choice)break;
 		switch (choice)
 		{
 		case 1:
-			s.to_register(path1);
+			cout << "   Registration !\n";
+			cout << "Create your login : ";
+			cin >> login;
+			cout << "Create your password : ";
+			cin >> password;
+			s.to_register(login, password);
+			s.save_in_file(path1);
 			if (s.check_login(path1) == true)
 			{
 				int choice1;
@@ -390,16 +429,32 @@ int main()
 		case 3:
 			if (a.cheak_admin(path) == true)
 			{
-				cout << "Hello admin" << a.get_login() << "\n";
+				cout << "Hello admin " << a.get_login() << "\n";
+				int choice2;
+				do {
+					choice2 = menu2();
+					if (!choice2)break;
+					switch (choice2)
+					{
+					case 1:
+
+						break;
+					case 2:
+						break;
+					case 3:
+
+						break;
+					}
+				} while (true);
 			}
 			else
 			{
-				cout << "It is not correct !\n";
+				cout << "There is no admin !\n";
 			}
 			system("pause");
 			break;
 		}
-	} while (true);
+	} while (true);*/
 
 
 
