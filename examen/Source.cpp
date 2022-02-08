@@ -354,13 +354,13 @@ int menu2()
 }
 int main()
 {
-	test t;
-	test t1;
+	//test t;
+	//test t1;
 	admin a("anna", "makukh");
 	string login, password;
 	string path = "admin"; string path1 = "students"; string path2 = "test";
-	t.do_test(t.read_from_file(path2));
-	/*a.save_in_file(path);
+	//t.do_test(t.read_from_file(path2));
+	a.save_in_file(path);
 	students s;
 	int choice;
 	do {
@@ -454,7 +454,7 @@ int main()
 			system("pause");
 			break;
 		}
-	} while (true);*/
+	} while (true);
 
 
 
